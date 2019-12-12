@@ -23,23 +23,26 @@
         </style>
     </head>
     <body>
-        <div enlaces>
-            <a href="javascript:cambiarMaterial('t', 'img/tex0.jpg')">material 0</a> |
-            <a href="javascript:cambiarMaterial('t', 'img/tex1.jpg')">material 1</a> |
-            <a href="javascript:cambiarMaterial('t', 'img/tex2.jpg')">material 2</a> |
-            <a href="javascript:cambiarMaterial('t', 'img/tex3.jpg')">material 3</a> |
-            <a href="javascript:cambiarMaterial('t', 'img/tex4.jpg')">material 4</a> |
+        <div>
+            <a href="javascript:cambiarMaterial('t', 'https://raw.githubusercontent.com/guillermo7227/tresd/master/public/img/tex0.jpg')">material 0</a> |
+            <a href="javascript:cambiarMaterial('t', 'https://raw.githubusercontent.com/guillermo7227/tresd/master/public/img/tex1.jpg')">material 1</a> |
+            <a href="javascript:cambiarMaterial('t', 'https://raw.githubusercontent.com/guillermo7227/tresd/master/public/img/tex2.jpg')">material 2</a> |
+            <a href="javascript:cambiarMaterial('t', 'https://raw.githubusercontent.com/guillermo7227/tresd/master/public/img/tex3.jpg')">material 3</a> |
+            <a href="javascript:cambiarMaterial('t', 'https://raw.githubusercontent.com/guillermo7227/tresd/master/public/img/tex4.jpg')">material 4</a> |
+            <a href="javascript:cambiarMaterial('t', 'img/texhd.jpg')">material HD</a> |
             <a href="javascript:cambiarMaterial('c', 'rgb(255, 0, 0)')">rojo</a> |
             <a href="javascript:cambiarMaterial('c', 'rgb(0, 255, 0)')">verde</a> |
             <a href="javascript:cambiarMaterial('c', 'rgb(0, 0, 255)')">azul</a> |
         </div>
 
         <script src="https://threejs.org/build/three.js"></script>
-        <script src="{{ asset('js/OBJLoader.js') }}"></script>
-        <script src="{{ asset('js/OrbitControls.js') }}"></script>
+        <script src="https://threejs.org/examples/js/loaders/OBJLoader.js"></script>
+        <script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
+        {{-- <script src="{{ asset('js/OBJLoader.js') }}"></script> --}}
+        {{-- <script src="{{ asset('js/OrbitControls.js') }}"></script> --}}
         <script>
 
-var textura0 = '/img/tex0.jpg';
+var textura0 = 'https://raw.githubusercontent.com/guillermo7227/tresd/master/public/img/tex0.jpg';
 var cambiarMaterial;
 var scene = new THREE.Scene();
 var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / 300, 0.1, 1000 );
@@ -65,6 +68,7 @@ loader.load(
 	function ( object ) {
 
         cambiarMaterial = function(tipo, valor) {
+            console.log(tipo,valor);
             switch (tipo) {
                 case 't': // textura
                     console.log('textura');
@@ -170,7 +174,7 @@ controls.update();
 
 function animate() {
 	requestAnimationFrame( animate );
-    objeto.rotation.y += 0.0010;
+    if (objeto) objeto.rotation.y += 0.0010;
 	renderer.render( scene, camera );
 }
 animate();
