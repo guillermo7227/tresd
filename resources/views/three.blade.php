@@ -7,7 +7,6 @@
         <title>Laravel</title>
 
         <!-- Fonts -->
-        <link href="https://fonts.googleapis.com/css?family=Nunito:200,600" rel="stylesheet">
 
         <!-- Styles -->
         <style>
@@ -29,10 +28,11 @@
             <a href="javascript:cambiarMaterial('t', 'https://raw.githubusercontent.com/guillermo7227/tresd/master/public/img/tex2.jpg')">material 2</a> |
             <a href="javascript:cambiarMaterial('t', 'https://raw.githubusercontent.com/guillermo7227/tresd/master/public/img/tex3.jpg')">material 3</a> |
             <a href="javascript:cambiarMaterial('t', 'https://raw.githubusercontent.com/guillermo7227/tresd/master/public/img/tex4.jpg')">material 4</a> |
-            <a href="javascript:cambiarMaterial('t', 'img/texhd.jpg')">material HD</a> |
-            <a href="javascript:cambiarMaterial('c', 'rgb(255, 0, 0)')">rojo</a> |
-            <a href="javascript:cambiarMaterial('c', 'rgb(0, 255, 0)')">verde</a> |
-            <a href="javascript:cambiarMaterial('c', 'rgb(0, 0, 255)')">azul</a> |
+            <a href="javascript:cambiarMaterial('t', 'https://raw.githubusercontent.com/guillermo7227/tresd/master/public/img/texhd.jpg')">material HD</a> |
+            <a href="javascript:cambiarMaterial('t', 'https://raw.githubusercontent.com/guillermo7227/tresd/master/public/img/tex.png')">material colores</a> |
+            <a href="javascript:cambiarMaterial('c', 0xFF0000)">rojo</a> |
+            <a href="javascript:cambiarMaterial('c', 0x00FF00)">verde</a> |
+            <a href="javascript:cambiarMaterial('c', 0x0000FF)">azul</a> |
         </div>
 
         <script src="https://threejs.org/build/three.js"></script>
@@ -42,17 +42,42 @@
         {{-- <script src="{{ asset('js/OrbitControls.js') }}"></script> --}}
         <script>
 
+var tamano = 400;
 var textura0 = 'https://raw.githubusercontent.com/guillermo7227/tresd/master/public/img/tex0.jpg';
 var cambiarMaterial;
 var scene = new THREE.Scene();
-var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / 300, 0.1, 1000 );
+var camera = new THREE.PerspectiveCamera( 75, tamano / tamano, 0.1, 1000 );
 
 var renderer = new THREE.WebGLRenderer();
-renderer.setSize( window.innerWidth, 300 );
+renderer.setSize( tamano, tamano );
 document.body.appendChild( renderer.domElement );
 
+// load a texture, set wrap mode to repeat
+var textureBG = new THREE.TextureLoader().load( "img/fondo.jpg" );
+// textureBG.wrapS = THREE.RepeatWrapping;
+// textureBG.wrapT = THREE.RepeatWrapping;
+// textureBG.repeat.set( 4, 4 );
 
-var light = new THREE.AmbientLight( 0xffffff, 1, 100 );
+scene.background = textureBG;
+
+var colorLuz = 0xfbfadd;
+
+var light = new THREE.AmbientLight( colorLuz, 0.1, 100 );
+scene.add( light );
+var light = new THREE.PointLight( colorLuz, 0.3, 100 ); // arriba
+light.position.set( 0, 10, 0 );
+scene.add( light );
+var light = new THREE.PointLight( colorLuz, 0.5, 100 ); // arriba izq
+light.position.set( -10, 10, 0 );
+scene.add( light );
+var light = new THREE.PointLight( colorLuz, 0.5, 100 ); // arriba der
+light.position.set( 10, 10, 0 );
+scene.add( light );
+var light = new THREE.PointLight( colorLuz, 0.5, 100 ); // arriba atras
+light.position.set( 0, 10, -10 );
+scene.add( light );
+var light = new THREE.PointLight( colorLuz, 0.7, 100 ); // arriba adelante
+light.position.set( 0, 10, 10 );
 scene.add( light );
 
 // instantiate a loader
@@ -63,12 +88,13 @@ var objeto;
 // load a resource
 loader.load(
 	// resource URL
-	'https://da6npmvqm28oa.cloudfront.net/obj_models/90aeb042-24cb-4334-93b3-95bb03c30183.obj',
+	'obj/obj1.obj',
+	// 'https://da6npmvqm28oa.cloudfront.net/obj_models/90aeb042-24cb-4334-93b3-95bb03c30183.obj',
 	// called when resource is loaded
 	function ( object ) {
 
         cambiarMaterial = function(tipo, valor) {
-            console.log(tipo,valor);
+
             switch (tipo) {
                 case 't': // textura
                     console.log('textura');
@@ -81,18 +107,12 @@ loader.load(
                         }
                     } );
                     break;
-                case 'c': //color
-                    console.log('color');
-                    cambiarMaterial('t', textura0);
-                    var mat = new THREE.MeshPhongMaterial({
-                        color: 0x0044ff,
-                        shading: THREE.FlatShading,
-                        side: THREE.DoubleSide
-                    });
+                case 'c': //color solido sin textura
+                    console.log('color solido');
+                    var mat = new THREE.MeshLambertMaterial( {color: valor} );
                     object.traverse( function( child ) {
                         if ( child instanceof THREE.Mesh ) {
-                          var color = new THREE.Color(valor);
-                          child.material.color = color;
+                          child.material = mat;
                         }
                     } );
                     break;
@@ -105,51 +125,6 @@ loader.load(
 
         scene.add( objeto );
 
-        // gradient
-// var mat = new THREE.MeshBasicMaterial({
-//   wireframe: false,
-//   vertexColors: THREE.VertexColors
-// }); // the same material for all the children of the object
-//   var size = new THREE.Vector3();
-//   var box3 = new THREE.Box3().setFromObject(object);
-//   box3.getSize(size);
-//   console.log(size);
-//
-//   var v3 = new THREE.Vector3(); // for re-use
-//
-//   var c = [
-//     new THREE.Color(0x00ff00),
-//     new THREE.Color(0xff0000)
-//   ];
-//   var cTemp = new THREE.Color(); // for re-use
-//
-//   object.traverse(child => {
-//     if (child.isMesh) {
-//
-//       let colors = []; // array for color values of the current mesh's geometry
-//
-//       let pos = child.geometry.attributes.position;
-//
-//       for(let i = 0; i < pos.count; i++){
-//
-//         v3.fromBufferAttribute(pos, i);
-//
-//         object.localToWorld(v3); // box3 is in world coords so we have to convert coortinates of the vertex from local to world
-//
-//         let a = (v3.y - box3.min.y) / size.y; // find the value in range 0..1
-//
-//         cTemp.copy(c[0]).lerp(c[1], a); // lerp the colors
-//
-//         colors.push(cTemp.r, cTemp.g, cTemp.b); // save values in the array
-//
-//         child.geometry.setAttribute("color", new THREE.BufferAttribute(new Float32Array(colors), 3)); // add a buffer attribute for colors
-//
-//         child.material = mat;
-//       }
-//     }
-//   });
-//   scene.add(object);
-// // fin gradient
 	},
 	// called when loading is in progresses
 	function ( xhr ) {
@@ -168,13 +143,13 @@ loader.load(
 
 var controls = new THREE.OrbitControls( camera, renderer.domElement );
 
-camera.position.set( 0, 0, 2 );
-controls.target = new THREE.Vector3(0, 1, 0);
+camera.position.set( 0, 0, 1.5 );
+controls.target = new THREE.Vector3(0, 0.7, 0);
 controls.update();
 
 function animate() {
 	requestAnimationFrame( animate );
-    if (objeto) objeto.rotation.y += 0.0010;
+    if (objeto) objeto.rotation.y += 0.0040;
 	renderer.render( scene, camera );
 }
 animate();
