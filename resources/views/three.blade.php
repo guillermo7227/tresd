@@ -30,6 +30,8 @@
             <a href="javascript:cambiarMaterial('t', 'https://raw.githubusercontent.com/guillermo7227/tresd/master/public/img/tex4.jpg')">material 4</a> |
             <a href="javascript:cambiarMaterial('t', 'https://raw.githubusercontent.com/guillermo7227/tresd/master/public/img/texhd.jpg')">material HD</a> |
             <a href="javascript:cambiarMaterial('t', 'https://raw.githubusercontent.com/guillermo7227/tresd/master/public/img/tex.png')">material colores</a> |
+            <a href="javascript:cambiarMaterial('t', 'img/texa.png')">material colores a</a> |
+            <a href="javascript:cambiarMaterial('t', 'img/texb.png')">material colores b</a> |
             <a href="javascript:cambiarMaterial('c', 0xFF0000)">rojo</a> |
             <a href="javascript:cambiarMaterial('c', 0x00FF00)">verde</a> |
             <a href="javascript:cambiarMaterial('c', 0x0000FF)">azul</a> |
@@ -53,10 +55,7 @@ renderer.setSize( tamano, tamano );
 document.body.appendChild( renderer.domElement );
 
 // load a texture, set wrap mode to repeat
-var textureBG = new THREE.TextureLoader().load( "img/fondo.jpg" );
-// textureBG.wrapS = THREE.RepeatWrapping;
-// textureBG.wrapT = THREE.RepeatWrapping;
-// textureBG.repeat.set( 4, 4 );
+var textureBG = new THREE.TextureLoader().load( "https://raw.githubusercontent.com/guillermo7227/tresd/master/public/img/fondo.jpg" );
 
 scene.background = textureBG;
 
@@ -88,7 +87,7 @@ var objeto;
 // load a resource
 loader.load(
 	// resource URL
-	'obj/obj1.obj',
+	'obj/obj2.obj',
 	// 'https://da6npmvqm28oa.cloudfront.net/obj_models/90aeb042-24cb-4334-93b3-95bb03c30183.obj',
 	// called when resource is loaded
 	function ( object ) {
@@ -125,6 +124,10 @@ loader.load(
 
         scene.add( objeto );
 
+        var controls = new THREE.OrbitControls( camera, renderer.domElement );
+
+        fitCameraToObject(camera, objeto, 6.5, controls);
+
 	},
 	// called when loading is in progresses
 	function ( xhr ) {
@@ -141,18 +144,60 @@ loader.load(
 );
 
 
-var controls = new THREE.OrbitControls( camera, renderer.domElement );
-
-camera.position.set( 0, 0, 1.5 );
-controls.target = new THREE.Vector3(0, 0.7, 0);
-controls.update();
-
 function animate() {
 	requestAnimationFrame( animate );
-    if (objeto) objeto.rotation.y += 0.0040;
+    // if (objeto) objeto.rotation.y += 0.0040;
 	renderer.render( scene, camera );
 }
 animate();
+
+
+const fitCameraToObject = function ( camera, object, offset, controls ) {
+
+    offset = offset || 1.25;
+
+    const boundingBox = new THREE.Box3();
+
+    // get bounding box of object - this will be used to setup controls and camera
+    boundingBox.setFromObject( object );
+
+    const center = boundingBox.getCenter();
+
+    const size = boundingBox.getSize();
+
+    // get the max side of the bounding box (fits to width OR height as needed )
+    const maxDim = Math.max( size.x, size.y, size.z );
+    const fov = camera.fov * ( Math.PI / 180 );
+    let cameraZ = Math.abs( maxDim / 4 * Math.tan( fov * 2 ) );
+
+    cameraZ *= offset; // zoom out a little so that objects don't fill the screen
+
+    // camera.position.z = cameraZ;
+    camera.position.z = center.z + cameraZ
+    camera.position.y = center.y;
+
+    const minZ = boundingBox.min.z;
+    const cameraToFarEdge = ( minZ < 0 ) ? -minZ + cameraZ : cameraZ - minZ;
+
+    camera.far = cameraToFarEdge * 3;
+    camera.updateProjectionMatrix();
+
+    if ( controls ) {
+
+      // set camera to rotate around center of loaded object
+      controls.target = center;
+
+      // prevent camera from zooming out far enough to create far plane cutoff
+      controls.maxDistance = cameraToFarEdge * 2;
+
+      controls.saveState();
+
+    } else {
+
+        camera.lookAt( center )
+
+   }
+}
         </script>
     </body>
 </html>
