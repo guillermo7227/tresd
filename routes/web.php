@@ -12,7 +12,7 @@
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('home');
 });
 Route::get('/three', function () {
     return view('three');
@@ -23,3 +23,7 @@ Route::get('/gradient', function () {
 Route::get('/grad2', function () {
     return view('grad2');
 });
+Route::get('/grad3', function () {
+    return view('grad3');
+});
+
