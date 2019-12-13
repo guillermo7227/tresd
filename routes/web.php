@@ -12,18 +12,26 @@
 */
 
 Route::get('/', function () {
-    return view('home');
+    return redirect('mystic');
 });
-Route::get('/three', function () {
-    return view('three');
+Route::get('/mystic', function () {
+    return view('mystic');
+})->name('mystic');
+
+Route::get('/echo', function () {
+    return view('echo');
 });
-Route::get('/gradient', function () {
-    return view('gradient');
+
+Route::get('/orochi', function () {
+    return view('orochi');
 });
-Route::get('/grad2', function () {
-    return view('grad2');
-});
-Route::get('/grad3', function () {
-    return view('grad3');
-});
+// Route::get('/gradient', function () {
+//     return view('gradient');
+// });
+// Route::get('/grad2', function () {
+//     return view('grad2');
+// });
+// Route::get('/grad3', function () {
+//     return view('grad3');
+// });
 
